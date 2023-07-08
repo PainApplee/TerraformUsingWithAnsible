@@ -1,0 +1,19 @@
+alertmanager:
+  hosts:
+    host1:
+      ansible_host: {IP}
+
+node_exporter:
+  hosts:
+    host1:
+      ansible_host: {IP}
+  
+prometheus:
+  hosts:
+    host1:
+      ansible_host: {IP}
+
+grafana:
+  hosts:
+    host1:
+      ansible_host: {IP}
