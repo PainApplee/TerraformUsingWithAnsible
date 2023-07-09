@@ -2,21 +2,38 @@ provider "google" {
   credentials = file ("./accountkey.json")
   project     = "education-357512"
   region      = "us-central1"
+
 }
 
+variable "pub_key" {
+  type    = string
+  default = "/home/user/.ssh/id_rsa.pub"
+}
+
+variable "prvt_key" {
+  type    = string
+  default = "/home/user/.ssh/id_rsa"
+}
+
+variable "ansible_playbook" {
+  type    = string
+  default = "./PrometheusWithGrafana/playbook.yml"
+}
+
+
 resource "google_compute_address" "default" {
-  name = "monitoring_ip"
+  name = "monitoring-ip"
 }
 
 
 resource "google_compute_instance" "monitoring" {
-  name         = "monitoring"
+  name         = "monitoring1"
   machine_type = "n1-standard-1"
   zone         = "us-central1-a"
 
 boot_disk {
     auto_delete = true
-    device_name = "monitoring"
+    device_name = "monitoring1"
 
     initialize_params {
       image = "projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20230628"
@@ -35,7 +52,7 @@ boot_disk {
   }
 
 metadata = {
-  ssh-keys = "ubuntu:${file("<pub_key_path>")}"
+  ssh-keys = "ubuntu:${file(var.pub_key)}"
 }
 
 provisioner "remote-exec" {
@@ -45,7 +62,7 @@ provisioner "remote-exec" {
       host        = google_compute_address.default.address
       type        = "ssh"
       user        = "ubuntu"
-      private_key = file("prvt_key_path")
+      private_key = file(var.prvt_key)
     }
   }
 
@@ -54,7 +71,7 @@ provisioner "remote-exec" {
 }
 
   provisioner "local-exec" {
-    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i ./inventory --private-key <prvt_key_path> -e 'pub_key=<pub_key_path>' <playbook_path>"
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i ./inventory --private-key ${var.prvt_key} -e 'pub_key=${var.pub_key}' ${var.ansible_playbook}"
   }
 
 }

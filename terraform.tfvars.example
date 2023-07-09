@@ -1,0 +1,3 @@
+pub_key="/home/user/.ssh/id_rsa.pub"
+prvt_key="/home/user/.ssh/id_rsa"
+ansible_playbook="./PrometheusWithGrafana/playbook.yml"
